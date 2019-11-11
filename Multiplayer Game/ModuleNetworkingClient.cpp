@@ -128,6 +128,10 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 	else if (state == ClientState::Playing)
 	{
 		// TODO(jesus): Handle incoming messages from server
+		if (message == ServerMessage::Replication)
+		{
+			client_replication.read(packet);
+		}
 	}
 }
 
@@ -186,6 +190,22 @@ void ModuleNetworkingClient::onUpdate()
 
 				sendPacket(packet, serverAddress);
 			}
+		}
+
+		if (Time.time > lastPacketReceivedTime + DISCONNECT_TIMEOUT_SECONDS)
+		{
+			disconnect();
+			WLOG("Server Ping not received");
+		}
+
+		if (Time.time > secondsSinceLastPing + PING_INTERVAL_SECONDS && state != ClientState::Stopped)
+		{
+			secondsSinceLastPing = Time.time;
+
+			OutputMemoryStream packet;
+			packet << ClientMessage::Ping;
+
+			sendPacket(packet, serverAddress);
 		}
 	}
 

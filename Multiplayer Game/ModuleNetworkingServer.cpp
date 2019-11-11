@@ -138,6 +138,7 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 					GameObject *gameObject = networkGameObjects[i];
 
 					// TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
+					proxy->server_replication.create(gameObject->networkId);
 				}
 
 				LOG("Message received: hello - from player %s", playerName.c_str());
@@ -188,6 +189,9 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 
 void ModuleNetworkingServer::onUpdate()
 {
+	bool send = false;
+	if (Time.time > secondsSinceLastPing + PING_INTERVAL_SECONDS)
+		send = true;
 	if (state == ServerState::Listening)
 	{
 		// Replication
@@ -195,12 +199,41 @@ void ModuleNetworkingServer::onUpdate()
 		{
 			if (clientProxy.connected)
 			{
+				if (Time.time > clientProxy.lastPacketReceivedTime + DISCONNECT_TIMEOUT_SECONDS)
+				{
+					
+					WLOG("Nothing received from client. Resetting Proxy");
+					onConnectionReset(clientProxy.address);
+					continue;
+				}
+
 				OutputMemoryStream packet;
 				packet << ServerMessage::Replication;
 
 				// TODO(jesus): If the replication interval passed and the replication manager of this proxy
 				//              has pending data, write and send a replication packet to this client.
+
+				if (clientProxy.server_replication.commands.size() > 0 && Time.time > clientProxy.secondsSinceLastReplication + replicationDeliveryIntervalSeconds)
+				{
+					clientProxy.secondsSinceLastReplication = Time.time;
+
+					clientProxy.server_replication.write(packet);
+					sendPacket(packet, clientProxy.address);
+				}
+
+				if (state != ServerState::Stopped && send)
+				{
+					OutputMemoryStream pingpacket;
+					pingpacket << ServerMessage::Ping;
+
+					sendPacket(pingpacket, clientProxy.address);
+				}
 			}
+		}
+
+		if (send)
+		{
+			secondsSinceLastPing = Time.time;
 		}
 	}
 }
@@ -218,6 +251,7 @@ void ModuleNetworkingServer::onConnectionReset(const sockaddr_in & fromAddress)
 			if (clientProxies[i].connected && proxy->clientId != clientProxies[i].clientId)
 			{
 				// TODO(jesus): Notify this proxy's replication manager about the destruction of this player's game object
+				clientProxies[i].server_replication.destroy(proxy->gameObject->networkId);
 			}
 		}
 
@@ -331,9 +365,10 @@ GameObject * ModuleNetworkingServer::spawnPlayer(ClientProxy &clientProxy, uint8
 	// Notify all client proxies' replication manager to create the object remotely
 	for (int i = 0; i < MAX_CLIENTS; ++i)
 	{
-		if (clientProxies[i].connected)
+		if (clientProxies[i].connected && clientProxies[i].clientId != clientProxy.clientId)
 		{
 			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+			clientProxies[i].server_replication.create(clientProxy.gameObject->networkId);
 		}
 	}
 
@@ -363,6 +398,7 @@ GameObject * ModuleNetworkingServer::spawnBullet(GameObject *parent)
 		if (clientProxies[i].connected)
 		{
 			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+			clientProxies[i].server_replication.create(gameObject->networkId);
 		}
 	}
 
@@ -382,6 +418,7 @@ void ModuleNetworkingServer::destroyNetworkObject(GameObject * gameObject)
 		if (clientProxies[i].connected)
 		{
 			// TODO(jesus): Notify this proxy's replication manager about the destruction of this game object
+			clientProxies[i].server_replication.destroy(gameObject->networkId);
 		}
 	}
 
@@ -400,6 +437,7 @@ void ModuleNetworkingServer::updateNetworkObject(GameObject * gameObject)
 		if (clientProxies[i].connected)
 		{
 			// TODO(jesus): Notify this proxy's replication manager about the update of this game object
+			clientProxies[i].server_replication.update(gameObject->networkId);
 		}
 	}
 }
