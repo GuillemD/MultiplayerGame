@@ -5,7 +5,6 @@ enum class RepAction {
 	Create,
 	Update,
 	Destroy,
-	NewClient
 };
 
 struct RepCommand
