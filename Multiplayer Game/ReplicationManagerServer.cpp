@@ -79,3 +79,37 @@ void ReplicationManagerServer::write(OutputMemoryStream & packet)
 	commands.clear();
 }
 
+
+void ReplicationManagerServer::AppendLostCommands(std::unordered_map<uint32, ReplicationAction>* repCommands)
+{
+	for (auto it : *repCommands) {
+		if (replicationCommands.find(it.first) == replicationCommands.end()) {
+			replicationCommands[it.first] = it.second;
+		}
+		else {
+			if (replicationCommands[it.first] == ReplicationAction::Update) {//only override if the new replication command (not the not send) is in action update
+				replicationCommands[it.first] = it.second;
+			}
+		}
+	}
+}
+
+
+ReplicationDeliveryDelegate::ReplicationDeliveryDelegate(std::unordered_map<uint32, ReplicationAction>& map, ReplicationManagerServer* server)
+{
+	storedReplicationCommands = map;
+	serverReplicationManager = server;
+}
+
+void ReplicationDeliveryDelegate::OnDeliverySuccess(DeliveryManager * deliveryManager)
+{
+	//succesfully delivered replication delivery
+
+}
+
+void ReplicationDeliveryDelegate::OnDeliveryFailure(DeliveryManager * deliveryManager)
+{
+	//resend packet
+	serverReplicationManager->AppendLostCommands(&storedReplicationCommands);
+
+}

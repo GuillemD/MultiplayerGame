@@ -9,6 +9,7 @@ public:
 	virtual void OnDeliveryFailure(DeliveryManager* deliveryManager) = 0;
 
 };
+
 struct Delivery
 {
 	uint32 sequenceNumber = 0;
@@ -54,5 +55,5 @@ private:
 	// - A list of sequence numbers pending ack
 
 	uint32 expectedSequenceNumber = 0;
-	std::vector<uint32> pendingAckDeliveries;
+	std::vector<uint32> pendingAcknowledgedDeliveries;
 };

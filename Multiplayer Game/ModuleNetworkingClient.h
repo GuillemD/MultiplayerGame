@@ -14,7 +14,7 @@ public:
 
 	void setPlayerInfo(const char *playerName, uint8 spaceshipType);
 
-
+	void sendTestPacket();
 
 private:
 
@@ -36,7 +36,7 @@ private:
 
 	void onDisconnect() override;
 
-
+	void sendPing();
 
 	//////////////////////////////////////////////////////////////////////
 	// Client state
@@ -62,7 +62,7 @@ private:
 	uint32 playerId = 0;
 	uint32 networkId = 0;
 
-
+	DeliveryManager deliveryManagerClient;
 	// Input ///////////
 
 	static const int MAX_INPUT_DATA_SIMULTANEOUS_PACKETS = 64;
@@ -84,3 +84,16 @@ private:
 	ReplicationManagerClient client_replication;
 };
 
+class LoginDeliveryDelegate : public DeliveryDelegate {
+public:
+
+
+	ModuleNetworkingClient* networkingClient = nullptr;
+
+	LoginDeliveryDelegate(const char * clientName, uint8 spaceshipType, ModuleNetworkingClient* client);
+
+	void OnDeliverySuccess(DeliveryManager* deliveryManager) override;
+	void OnDeliveryFailure(DeliveryManager* deliveryManager) override;
+
+
+};

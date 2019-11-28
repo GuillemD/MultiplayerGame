@@ -1,4 +1,5 @@
 #include "Networks.h"
+#include "ModuleNetworkingClient.h"
 
 
 
@@ -239,4 +240,45 @@ void ModuleNetworkingClient::onDisconnect()
 	}
 
 	App->modRender->cameraPosition = {};
+}
+
+void ModuleNetworkingClient::sendPing()
+{
+	OutputMemoryStream pingPacket;
+	pingPacket << ClientMessage::Ping;
+	sendPacket(pingPacket, serverAddress);
+	secondsSinceLastPing = 0.0f;
+}
+
+void ModuleNetworkingClient::sendTestPacket()
+{
+	OutputMemoryStream stream;
+	stream << ClientMessage::Hello;
+
+	LoginDeliveryDelegate* delegate = nullptr;
+	delegate = new LoginDeliveryDelegate(playerName.c_str(), spaceshipType, this);
+	deliveryManagerClient.writeSequenceNumber(stream, *delegate);
+
+	stream << playerName;
+	stream << spaceshipType;
+
+
+	sendPacket(stream, serverAddress);
+}
+
+LoginDeliveryDelegate::LoginDeliveryDelegate(const char* clientName, uint8 _spaceshipType, ModuleNetworkingClient* client)
+{
+	networkingClient = client;
+
+}
+
+void LoginDeliveryDelegate::OnDeliverySuccess(DeliveryManager * deliveryManager)
+{
+	//succesfully delivered login delivery
+
+}
+
+void LoginDeliveryDelegate::OnDeliveryFailure(DeliveryManager * deliveryManager)
+{
+	networkingClient->sendTestPacket();
 }

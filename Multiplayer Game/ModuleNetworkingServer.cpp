@@ -215,19 +215,27 @@ void ModuleNetworkingServer::onUpdate()
 
 				if (clientProxy.server_replication.commands.size() > 0 && Time.time > clientProxy.secondsSinceLastReplication + replicationDeliveryIntervalSeconds)
 				{
-					clientProxy.secondsSinceLastReplication = Time.time;
-
-					clientProxy.server_replication.write(packet);
-					sendPacket(packet, clientProxy.address);
-				}
-
-				if (state != ServerState::Stopped && send)
-				{
 					OutputMemoryStream pingpacket;
-					pingpacket << ServerMessage::Ping;
+					pingpacket << ServerMessage::Replication;
+					//replication message containing the input sequence number
+					uint32 num = clientProxy.lastInputSequenceNumberReceived;
+					pingpacket << num;
 
+					//writing the replication sequence number
+
+					ReplicationDeliveryDelegate* delegate = nullptr;
+					if (clientProxy.replicationManagerServer.replicationCommands.size() > 0)
+						delegate = new ReplicationDeliveryDelegate(clientProxy.replicationManagerServer.replicationCommands, &clientProxy.replicationManagerServer);
+					clientProxy.deliveryManagerServer.writeSequenceNumber(RepPacket, *delegate);
+
+
+					//writing the replication data
+					if (clientProxy.replicationManagerServer.replicationCommands.size() > 0) {
+						clientProxy.replicationManagerServer.write(RepPacket);
+					}
+					clientProxy.secondsSinceLastReplication = 0;
 					sendPacket(pingpacket, clientProxy.address);
-				}
+
 			}
 		}
 

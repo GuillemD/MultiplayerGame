@@ -1,5 +1,18 @@
 #pragma once
 
+enum class ReplicationAction {
+	None,
+	Create,
+	Update,
+	Destroy
+};
+
+struct ReplicationCommand {
+	ReplicationAction action;
+	uint32 networkID;
+};
+
+
 class ReplicationManagerServer
 {
 public:
@@ -10,8 +23,24 @@ public:
 
 	void write(OutputMemoryStream &packet);
 
+	void AppendLostCommands(std::unordered_map<uint32, ReplicationAction> *repCommands);
+
+	std::unordered_map<uint32, ReplicationAction> replicationCommands;
+
 public:
 
 	std::vector<RepCommand> commands;
 
 };
+
+class ReplicationDeliveryDelegate : public DeliveryDelegate {
+public:
+	ReplicationDeliveryDelegate(std::unordered_map<uint32, ReplicationAction> & repCommands, ReplicationManagerServer* server);
+
+	void OnDeliverySuccess(DeliveryManager* deliveryManager) override;
+	void OnDeliveryFailure(DeliveryManager* deliveryManager) override;
+
+	std::unordered_map<uint32, ReplicationAction> storedReplicationCommands;
+	ReplicationManagerServer* serverReplicationManager = nullptr;
+};
+
