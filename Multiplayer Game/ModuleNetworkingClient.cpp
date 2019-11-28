@@ -169,6 +169,17 @@ void ModuleNetworkingClient::onUpdate()
 			inputPacketData.verticalAxis = Input.verticalAxis;
 			inputPacketData.buttonBits = packInputControllerButtons(Input);
 
+			/*InputController new_input = inputControllerFromInputPacketData(inputPacketData, Input);
+			GameObject* player = App->modLinkingContext->getNetworkGameObject(networkId);
+			if (player)
+			{
+				if (new_input.horizontalAxis != 0.0f || new_input.verticalAxis != 0.0f)
+				{
+					float speed = 180.0f;
+					player->position += vec2{ 1,0 } *new_input.horizontalAxis * speed * Time.deltaTime;
+					player->position += vec2{ 0,-1 } *new_input.verticalAxis * speed * Time.deltaTime;
+				}
+			}*/
 			// Create packet (if there's input and the input delivery interval exceeded)
 			if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
 			{
