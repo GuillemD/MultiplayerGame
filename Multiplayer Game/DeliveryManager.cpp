@@ -1,8 +1,18 @@
 #include "Networks.h"
+#include "DeliveryManager.h"
 
-Delivery* DeliveryManager::WriteSequenceNumber(OutputMemoryStream& packet)
+Delivery * DeliveryManager::writeSequenceNumber(OutputMemoryStream & packet, DeliveryDelegate& _delegate)
 {
-	return nullptr;
+	packet << nextSequenceNumber;
+
+	Delivery delivery;
+	delivery.dispatchTime = Time.time;
+	delivery.sequenceNumber = nextSequenceNumber++;
+	delivery.delegate = &_delegate;
+
+	pendingDeliveries.push_back(delivery);
+
+	return &delivery;
 }
 
 bool DeliveryManager::ProcessSequenceNumber(const InputMemoryStream& packet)
