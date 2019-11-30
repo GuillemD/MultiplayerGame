@@ -15,6 +15,7 @@ struct Behaviour
 
 struct Spaceship : public Behaviour
 {
+	bool collided_with_wall = false;
 	void start() override
 	{
 		gameObject->tag = (uint32)(Random.next() * UINT_MAX);
@@ -29,7 +30,7 @@ struct Spaceship : public Behaviour
 			NetworkUpdate(gameObject);
 		}
 
-		if (input.actionDown == ButtonState::Pressed)
+		if (input.actionDown == ButtonState::Pressed && !collided_with_wall)
 		{
 			const float advanceSpeed = 200.0f;
 			gameObject->position += vec2FromDegrees(gameObject->angle) * advanceSpeed * Time.deltaTime;
@@ -55,6 +56,10 @@ struct Spaceship : public Behaviour
 			// instead, make the gameObject invisible or disconnect the client.
 
 			// Destroy other player
+		}
+		if (c2.type == ColliderType::Wall)
+		{
+			collided_with_wall = true;
 		}
 	}
 };

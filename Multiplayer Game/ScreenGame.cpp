@@ -37,15 +37,24 @@ void ScreenGame::enable()
 	spaceBottomRight->texture = App->modResources->space;
 	spaceBottomRight->order = -1;
 
+	//left wall
 	wall1 = App->modNetServer->spawnWalls();
-	wall1->angle = 90.0f;
+	wall1->size = { 50,800 };
+	wall1->position = { -760,0 };
+	//top wall
 	wall2 = App->modNetServer->spawnWalls();
-	wall2->position = { 150,0 };
+	wall2->size = { 50,1470 };
+	wall2->position = { 0,-390 };
+	wall2->angle = 90.0f;
+	//right wall
 	wall3 = App->modNetServer->spawnWalls();
-	wall3->position = { 300,0 };
-	wall3->angle = 90.0f;
+	wall3->size = { 50,800 };
+	wall3->position = { 760,0 };
+	//bottom wall
 	wall4 = App->modNetServer->spawnWalls();
-	wall4->position = { 450,0 };
+	wall4->size = { 50,1470 };
+	wall4->position = { 0,390 };
+	wall4->angle = 90.0f;
 	
 }
 
