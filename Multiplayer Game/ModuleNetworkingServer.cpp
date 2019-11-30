@@ -418,6 +418,7 @@ GameObject * ModuleNetworkingServer::spawnBullet(GameObject *parent)
 	gameObject->texture = App->modResources->laser;
 	gameObject->textureType = TextureType::Laser;
 	gameObject->collider = App->modCollision->addCollider(ColliderType::Laser, gameObject);
+	gameObject->collider->isTrigger = true;
 
 	// Create behaviour
 	gameObject->behaviour = new Laser;

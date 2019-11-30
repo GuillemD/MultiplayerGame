@@ -15,7 +15,7 @@ struct Behaviour
 
 struct Spaceship : public Behaviour
 {
-	bool collided_with_wall = false;
+	
 	void start() override
 	{
 		gameObject->tag = (uint32)(Random.next() * UINT_MAX);
@@ -79,5 +79,13 @@ struct Laser : public Behaviour
 
 		const float lifetimeSeconds = 2.0f;
 		if (secondsSinceCreation > lifetimeSeconds) NetworkDestroy(gameObject);
+	}
+
+	void onCollisionTriggered(Collider &c1, Collider &c2) override
+	{
+		if (c2.type == ColliderType::Wall)
+		{
+			NetworkDestroy(gameObject);
+		}
 	}
 };

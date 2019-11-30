@@ -5,10 +5,23 @@ GameObject *spaceTopLeft = nullptr;
 GameObject *spaceTopRight = nullptr;
 GameObject *spaceBottomLeft = nullptr;
 GameObject *spaceBottomRight = nullptr;
+
+//outer walls
 GameObject *wall1 = nullptr;
 GameObject *wall2 = nullptr;
 GameObject *wall3 = nullptr;
 GameObject *wall4 = nullptr;
+
+//cover
+GameObject *coverTopLeft = nullptr;
+GameObject *coverTopRight = nullptr;
+GameObject *coverBotLeft = nullptr;
+GameObject *coverBotRight = nullptr;
+
+GameObject *coverCenter1 = nullptr;
+GameObject *coverCenter2 = nullptr;
+
+
 
 void ScreenGame::enable()
 {
@@ -55,7 +68,37 @@ void ScreenGame::enable()
 	wall4->size = { 50,1470 };
 	wall4->position = { 0,390 };
 	wall4->angle = 90.0f;
-	
+
+	//top left cover
+	coverTopLeft = App->modNetServer->spawnWalls();
+	coverTopLeft->size = { 20,110 };
+	coverTopLeft->position = { -490,-180 };
+
+	//top right cover
+	coverTopRight = App->modNetServer->spawnWalls();
+	coverTopRight->size = { 20,110 };
+	coverTopRight->position = { 490,-180 };
+
+	//bot left cover
+	coverBotLeft = App->modNetServer->spawnWalls();
+	coverBotLeft->size = { 20,110 };
+	coverBotLeft->position = { -490, 180 };
+
+	//bot right cover
+	coverBotRight = App->modNetServer->spawnWalls();
+	coverBotRight->size = { 20,110 };
+	coverBotRight->position = { 490,180 };
+
+	//center
+	coverCenter1 = App->modNetServer->spawnWalls();
+	coverCenter1->size = { 20,170 };
+	coverCenter1->angle = 45.0f;
+
+	coverCenter2 = App->modNetServer->spawnWalls();
+	coverCenter2->size = { 20,170 };
+	coverCenter2->angle = -45.0f;
+
+
 }
 
 void ScreenGame::update()
@@ -88,8 +131,17 @@ void ScreenGame::disable()
 	Destroy(spaceTopRight);
 	Destroy(spaceBottomLeft);
 	Destroy(spaceBottomRight);
+
 	Destroy(wall1);
 	Destroy(wall2);
 	Destroy(wall3);
 	Destroy(wall4);
+
+	Destroy(coverTopLeft);
+	Destroy(coverTopRight);
+	Destroy(coverBotLeft);
+	Destroy(coverBotRight);
+
+	Destroy(coverCenter1);
+	Destroy(coverCenter2);
 }
