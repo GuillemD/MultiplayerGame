@@ -30,7 +30,7 @@ struct Spaceship : public Behaviour
 			NetworkUpdate(gameObject);
 		}
 
-		if (input.actionDown == ButtonState::Pressed && !collided_with_wall)
+		if (input.actionDown == ButtonState::Pressed)
 		{
 			const float advanceSpeed = 200.0f;
 			gameObject->position += vec2FromDegrees(gameObject->angle) * advanceSpeed * Time.deltaTime;
@@ -59,7 +59,7 @@ struct Spaceship : public Behaviour
 		}
 		if (c2.type == ColliderType::Wall)
 		{
-			collided_with_wall = true;
+			gameObject->position -= gameObject->position / 100;
 		}
 	}
 };
