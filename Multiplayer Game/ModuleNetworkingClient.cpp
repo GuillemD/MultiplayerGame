@@ -1,8 +1,6 @@
 #include "Networks.h"
 #include "ModuleNetworkingClient.h"
 
-
-
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworkingClient public methods
 //////////////////////////////////////////////////////////////////////
@@ -18,6 +16,11 @@ void ModuleNetworkingClient::setPlayerInfo(const char * pPlayerName, uint8 pSpac
 {
 	playerName = pPlayerName;
 	spaceshipType = pSpaceshipType;
+}
+
+void ModuleNetworkingClient::SetInputDataFront(uint32 front)
+{
+	inputDataFront = front;
 }
 
 
@@ -54,6 +57,8 @@ void ModuleNetworkingClient::onStart()
 	secondsSinceLastInputDelivery = 0.0f;
 	secondsSinceLastPing = 0.0f;
 	lastPacketReceivedTime = Time.time;
+
+	deliveryManager = new DeliveryManager;
 }
 
 void ModuleNetworkingClient::onGui()
@@ -129,10 +134,9 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 	else if (state == ClientState::Playing)
 	{
 		// TODO(jesus): Handle incoming messages from server
-		if (message == ServerMessage::Replication)
-		{
-			client_replication.read(packet);
-		}
+		if (message == ServerMessage::Replication && deliveryManager->ProcessSequenceNumber(packet))
+			replicationManager.Read(packet, this);
+
 	}
 }
 
@@ -158,71 +162,85 @@ void ModuleNetworkingClient::onUpdate()
 	}
 	else if (state == ClientState::Playing)
 	{
-		secondsSinceLastInputDelivery += Time.deltaTime;
 
-		if (inputDataBack - inputDataFront < ArrayCount(inputData))
-		{
-			uint32 currentInputData = inputDataBack++;
-			InputPacketData &inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
-			inputPacketData.sequenceNumber = currentInputData;
-			inputPacketData.horizontalAxis = Input.horizontalAxis;
-			inputPacketData.verticalAxis = Input.verticalAxis;
-			inputPacketData.buttonBits = packInputControllerButtons(Input);
-
-			/*InputController new_input = inputControllerFromInputPacketData(inputPacketData, Input);
-			GameObject* player = App->modLinkingContext->getNetworkGameObject(networkId);
-			if (player)
-			{
-				if (new_input.horizontalAxis != 0.0f || new_input.verticalAxis != 0.0f)
-				{
-					float speed = 180.0f;
-					player->position += vec2{ 1,0 } *new_input.horizontalAxis * speed * Time.deltaTime;
-					player->position += vec2{ 0,-1 } *new_input.verticalAxis * speed * Time.deltaTime;
-				}
-			}*/
-			// Create packet (if there's input and the input delivery interval exceeded)
-			if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
-			{
-				secondsSinceLastInputDelivery = 0.0f;
-
-				OutputMemoryStream packet;
-				packet << ClientMessage::Input;
-
-				for (uint32 i = inputDataFront; i < inputDataBack; ++i)
-				{
-					InputPacketData &inputPacketData = inputData[i % ArrayCount(inputData)];
-					packet << inputPacketData.sequenceNumber;
-					packet << inputPacketData.horizontalAxis;
-					packet << inputPacketData.verticalAxis;
-					packet << inputPacketData.buttonBits;
-				}
-
-				// Clear the queue
-				inputDataFront = inputDataBack;
-
-				sendPacket(packet, serverAddress);
-			}
-		}
-
-		if (Time.time > lastPacketReceivedTime + DISCONNECT_TIMEOUT_SECONDS)
+		// Disconect from server since we have no response
+		if (Time.time - lastPacketReceivedTime > DISCONNECT_TIMEOUT_SECONDS)
 		{
 			disconnect();
-			WLOG("Server Ping not received");
 		}
-
-		if (Time.time > secondsSinceLastPing + PING_INTERVAL_SECONDS && state != ClientState::Stopped)
+		else
 		{
-			secondsSinceLastPing = Time.time;
+			for (GameObject& gameObject : App->modGameObject->gameObjects)
+			{
+				if (gameObject.state == GameObject::UPDATING)
+				{
+					gameObject.secondsElapsed += Time.deltaTime;
+
+					float percentatge = gameObject.secondsElapsed / REPLICATION_INTERVAL_SECONDS;
+					if (percentatge > 1)
+						percentatge = 1;
+
+					gameObject.angle = ((gameObject.finalAngle - gameObject.initialAngle) * percentatge) + gameObject.initialAngle;
+					gameObject.position = ((gameObject.finalPos - gameObject.initialPos) * percentatge) + gameObject.initialPos;
+				}
+			}
+
+
+			secondsSinceLastInputDelivery += Time.deltaTime;
+			secondsSinceLastPing += Time.deltaTime;
+
+			// Send ping to server
+			if (secondsSinceLastPing > PING_INTERVAL_SECONDS)
+			{
+				secondsSinceLastPing = 0.f;
+
+				OutputMemoryStream ping;
+				ping << ClientMessage::Ping;
+
+				sendPacket(ping, serverAddress);
+			}
+
+			if (inputDataBack - inputDataFront <= ArrayCount(inputData))
+			{
+				uint32 currentInputData = inputDataBack++;
+				InputPacketData& inputPacketData = inputData[currentInputData % ArrayCount(inputData)];
+				inputPacketData.sequenceNumber = currentInputData;
+				inputPacketData.horizontalAxis = Input.horizontalAxis;
+				inputPacketData.verticalAxis = Input.verticalAxis;
+				inputPacketData.buttonBits = packInputControllerButtons(Input);
+
+				// Create packet (if there's input and the input delivery interval exceeded)
+				if (secondsSinceLastInputDelivery > inputDeliveryIntervalSeconds)
+				{
+					secondsSinceLastInputDelivery = 0.0f;
+
+					OutputMemoryStream packet;
+					packet << ClientMessage::Input;
+
+					for (uint32 i = inputDataFront; i < inputDataBack; ++i)
+					{
+						InputPacketData& inputPacketData = inputData[i % ArrayCount(inputData)];
+						packet << inputPacketData.sequenceNumber;
+						packet << inputPacketData.horizontalAxis;
+						packet << inputPacketData.verticalAxis;
+						packet << inputPacketData.buttonBits;
+					}
+
+					sendPacket(packet, serverAddress);
+				}
+			}
 
 			OutputMemoryStream packet;
-			packet << ClientMessage::Ping;
-
+			packet << ClientMessage::Delivery;
+			deliveryManager->WriteSequenceNumber(packet);
 			sendPacket(packet, serverAddress);
+
+			deliveryManager->ProcessTimedOutPackets();
 		}
 	}
 
 	// Make the camera focus the player game object
-	GameObject *playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
+	GameObject* playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 	if (playerGameObject != nullptr)
 	{
 		App->modRender->cameraPosition = playerGameObject->position;
@@ -251,45 +269,4 @@ void ModuleNetworkingClient::onDisconnect()
 	}
 
 	App->modRender->cameraPosition = {};
-}
-
-void ModuleNetworkingClient::sendPing()
-{
-	OutputMemoryStream pingPacket;
-	pingPacket << ClientMessage::Ping;
-	sendPacket(pingPacket, serverAddress);
-	secondsSinceLastPing = 0.0f;
-}
-
-void ModuleNetworkingClient::sendTestPacket()
-{
-	OutputMemoryStream stream;
-	stream << ClientMessage::Hello;
-
-	LoginDeliveryDelegate* delegate = nullptr;
-	delegate = new LoginDeliveryDelegate(playerName.c_str(), spaceshipType, this);
-	deliveryManagerClient.writeSequenceNumber(stream, *delegate);
-
-	stream << playerName;
-	stream << spaceshipType;
-
-
-	sendPacket(stream, serverAddress);
-}
-
-LoginDeliveryDelegate::LoginDeliveryDelegate(const char* clientName, uint8 _spaceshipType, ModuleNetworkingClient* client)
-{
-	networkingClient = client;
-
-}
-
-void LoginDeliveryDelegate::OnDeliverySuccess(DeliveryManager * deliveryManager)
-{
-	//succesfully delivered login delivery
-
-}
-
-void LoginDeliveryDelegate::OnDeliveryFailure(DeliveryManager * deliveryManager)
-{
-	networkingClient->sendTestPacket();
 }

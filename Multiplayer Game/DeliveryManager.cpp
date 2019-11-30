@@ -1,112 +1,118 @@
 #include "Networks.h"
 #include "DeliveryManager.h"
 
-Delivery * DeliveryManager::writeSequenceNumber(OutputMemoryStream & packet, DeliveryDelegate& _delegate)
+Delivery* DeliveryManager::WriteSequenceNumber(OutputMemoryStream& packet)
 {
-	packet << nextSequenceNumber;
+	packet << nextSeqNum;
 
-	Delivery delivery;
-	delivery.dispatchTime = Time.time;
-	delivery.sequenceNumber = nextSequenceNumber++;
-	delivery.delegate = &_delegate;
+	Delivery* delivery = new Delivery;
+	delivery->delegate = new DeliveryDelegate;
+
+	delivery->dispatchTime = Time.time;
+	delivery->sequenceNumber = nextSeqNum;
+	nextSeqNum++;
 
 	pendingDeliveries.push_back(delivery);
 
-	return &delivery;
+	return delivery;
 }
 
 bool DeliveryManager::ProcessSequenceNumber(const InputMemoryStream& packet)
 {
-	uint32 receivedSequenceNumber = 0;
-	packet >> receivedSequenceNumber;
-	if (expectedSequenceNumber == receivedSequenceNumber) {
-		pendingAcknowledgedDeliveries.push_back(receivedSequenceNumber);
-		++expectedSequenceNumber;
-		return true;
+	bool ret = false;
+
+	uint32 currSeqNum; packet >> currSeqNum;
+
+	if (currSeqNum >= nextSeqNumExpected)
+	{
+		pendingNumSeqList.push_back(currSeqNum);
+		nextSeqNumExpected = currSeqNum + 1;
+		ret = true;
 	}
 
-	return false;
+	return ret;
 }
 
 bool DeliveryManager::HasSequenceNumbersPendingAck() const
 {
-	return !pendingAcknowledgedDeliveries.empty();
+	return !pendingNumSeqList.empty();
 }
 
-void DeliveryManager::WritesequenceNumbersPendingAck(OutputMemoryStream& packet)
+void DeliveryManager::WriteSequenceNumbersPendingAck(OutputMemoryStream& packet)
 {
-	for (auto &it : pendingAcknowledgedDeliveries) {
-		uint32 sequenceNum = it;
-		packet << sequenceNum;
+	packet << pendingNumSeqList.size();
+	for (std::list<uint32>::const_iterator it = pendingNumSeqList.begin(); it != pendingNumSeqList.end(); ++it)
+	{
+		packet << *it;
 	}
-	pendingAcknowledgedDeliveries.clear();
+	pendingNumSeqList.clear();
 }
 
 void DeliveryManager::ProcessAckdSequenceNumbers(const InputMemoryStream& packet)
 {
-	while (packet.RemainingByteCount() > 0) {
-		uint32 seqNumber = 0;
-		packet >> seqNumber;
-		bool deliveryFound = false;
-		for (auto it = pendingDeliveries.begin(); it != pendingDeliveries.end(); it++)
+	int size; packet >> size;
+
+	for (int it = 0; it < size; ++it)
+	{
+		uint32 seqNum; packet >> seqNum;
+
+		for (auto delivery : pendingDeliveries)
 		{
-			if ((*it).sequenceNumber == seqNumber) {
-				if ((*it).delegate) {//not null
-					(*it).delegate->OnDeliverySuccess(this);
-				}
-				(*it).CleanUp();
-				pendingDeliveries.erase(it);
-				deliveryFound = true;
+			if (delivery->sequenceNumber == seqNum)
+			{
+				delivery->delegate->OnDeliverySuccess(this);
+				pendingDeliveries.remove(delivery);
+				delete delivery->delegate;
+				delete delivery;
 				break;
 			}
 		}
-		if (!deliveryFound) {
-
-			//error: sequence number to acknowledge is missing!
-			// LOG
-			
-		}
 	}
-	
 }
 
 void DeliveryManager::ProcessTimedOutPackets()
 {
-	std::vector<int> deliveryIndexToDelete;
-	for (int i = 0; i < pendingDeliveries.size(); i++)
-	{
-		if (Time.time - pendingDeliveries[i].dispatchTime > PACKET_DELIVERY_TIMEOUT_SECONDS) {
-			if (pendingDeliveries[i].delegate)//not null
-			{
-				pendingDeliveries[i].delegate->OnDeliveryFailure(this);
-				pendingDeliveries[i].CleanUp();
-			}
+	std::list<std::list<Delivery*>::iterator> toDelete;
 
-			deliveryIndexToDelete.push_back(i);
+	for (std::list<Delivery*>::iterator it = pendingDeliveries.begin(); it != pendingDeliveries.end(); ++it)
+	{
+		if (Time.time - (*it)->dispatchTime >= PACKET_DELIVERY_TIMEOUT_SECONDS)
+		{
+			(*it)->delegate->OnDeliveryFailure(this);
+			toDelete.push_back(it);
+			delete (*it)->delegate;
+			delete* it;
 		}
 	}
-	for (int i = deliveryIndexToDelete.size() - 1; i >= 0; i--) {
-		pendingDeliveries.erase(pendingDeliveries.begin() + deliveryIndexToDelete[i]);
+
+	for (auto mode : toDelete)
+	{
+		pendingDeliveries.erase(mode);
 	}
-	deliveryIndexToDelete.clear();
 }
 
 void DeliveryManager::Clear()
 {
-	for (auto &it : pendingDeliveries) {
-		it.CleanUp();
+	for (auto delivery : pendingDeliveries)
+	{
+		delete delivery->delegate;
+		delete delivery;
 	}
 	pendingDeliveries.clear();
-
-	pendingAcknowledgedDeliveries.clear();
-	nextSequenceNumber = 0;
-	expectedSequenceNumber = 0;
+	pendingNumSeqList.clear();
 }
 
-void Delivery::CleanUp()
+
+//---------------------------------------------------------------------------------------------------------------------
+//-----------------------------------------------DELIVERY DELEGATE-----------------------------------------------------
+//---------------------------------------------------------------------------------------------------------------------
+
+void DeliveryDelegate::OnDeliverySuccess(DeliveryManager* deliveryManager)
 {
-	if (delegate) {
-		delete delegate;
-		delegate = nullptr;
-	}
+	//
+}
+
+void DeliveryDelegate::OnDeliveryFailure(DeliveryManager* deliveryManager)
+{
+	//
 }

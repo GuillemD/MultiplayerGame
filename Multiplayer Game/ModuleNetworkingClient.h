@@ -14,7 +14,8 @@ public:
 
 	void setPlayerInfo(const char *playerName, uint8 spaceshipType);
 
-	void sendTestPacket();
+	void SetInputDataFront(uint32 front);
+
 
 private:
 
@@ -36,7 +37,6 @@ private:
 
 	void onDisconnect() override;
 
-	void sendPing();
 
 	//////////////////////////////////////////////////////////////////////
 	// Client state
@@ -62,7 +62,7 @@ private:
 	uint32 playerId = 0;
 	uint32 networkId = 0;
 
-	DeliveryManager deliveryManagerClient;
+
 	// Input ///////////
 
 	static const int MAX_INPUT_DATA_SIMULTANEOUS_PACKETS = 64;
@@ -81,19 +81,8 @@ private:
 	double lastPacketReceivedTime = 0.0f; // NOTE(jesus): Use this to implement client timeout
 	float secondsSinceLastPing = 0.0f;    // NOTE(jesus): Use this to implement ping to server
 
-	ReplicationManagerClient client_replication;
+	ReplicationManagerClient replicationManager;
+
+	DeliveryManager* deliveryManager;
 };
 
-class LoginDeliveryDelegate : public DeliveryDelegate {
-public:
-
-
-	ModuleNetworkingClient* networkingClient = nullptr;
-
-	LoginDeliveryDelegate(const char * clientName, uint8 spaceshipType, ModuleNetworkingClient* client);
-
-	void OnDeliverySuccess(DeliveryManager* deliveryManager) override;
-	void OnDeliveryFailure(DeliveryManager* deliveryManager) override;
-
-
-};
