@@ -100,50 +100,57 @@ void ModuleNetworkingServer::onPacketReceived(const InputMemoryStream &packet, c
 		if (message == ClientMessage::Hello)
 		{
 			bool newClient = false;
-
-			if (proxy == nullptr)
+			if (num_active_players < 4)
 			{
-				proxy = createClientProxy();
-
-				newClient = true;
-
-				std::string playerName;
-				uint8 spaceshipType;
-				packet >> playerName;
-				packet >> spaceshipType;
-
-				proxy->address.sin_family = fromAddress.sin_family;
-				proxy->address.sin_addr.S_un.S_addr = fromAddress.sin_addr.S_un.S_addr;
-				proxy->address.sin_port = fromAddress.sin_port;
-				proxy->connected = true;
-				proxy->name = playerName;
-				proxy->clientId = nextClientId++;
-
-				// Create new network object
-				spawnPlayer(*proxy, spaceshipType);
-
-				// Send welcome to the new player
-				OutputMemoryStream welcomePacket;
-				welcomePacket << ServerMessage::Welcome;
-				welcomePacket << proxy->clientId;
-				welcomePacket << proxy->gameObject->networkId;
-				sendPacket(welcomePacket, fromAddress);
-
-				// Send all network objects to the new player
-				uint16 networkGameObjectsCount;
-				GameObject *networkGameObjects[MAX_NETWORK_OBJECTS];
-				App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
-				for (uint16 i = 0; i < networkGameObjectsCount; ++i)
+				if (proxy == nullptr)
 				{
-					GameObject *gameObject = networkGameObjects[i];
+					proxy = createClientProxy();
 
-					// TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
-					proxy->replicationManager.create(gameObject->networkId);
+					newClient = true;
 
+					std::string playerName;
+					uint8 spaceshipType;
+					packet >> playerName;
+					packet >> spaceshipType;
+
+					proxy->address.sin_family = fromAddress.sin_family;
+					proxy->address.sin_addr.S_un.S_addr = fromAddress.sin_addr.S_un.S_addr;
+					proxy->address.sin_port = fromAddress.sin_port;
+					proxy->connected = true;
+					proxy->name = playerName;
+					proxy->clientId = nextClientId++;
+
+					// Create new network object
+					spawnPlayer(*proxy, spaceshipType);
+
+					// Send welcome to the new player
+					OutputMemoryStream welcomePacket;
+					welcomePacket << ServerMessage::Welcome;
+					welcomePacket << proxy->clientId;
+					welcomePacket << proxy->gameObject->networkId;
+					sendPacket(welcomePacket, fromAddress);
+
+					// Send all network objects to the new player
+					uint16 networkGameObjectsCount;
+					GameObject *networkGameObjects[MAX_NETWORK_OBJECTS];
+					App->modLinkingContext->getNetworkGameObjects(networkGameObjects, &networkGameObjectsCount);
+					for (uint16 i = 0; i < networkGameObjectsCount; ++i)
+					{
+						GameObject *gameObject = networkGameObjects[i];
+
+						// TODO(jesus): Notify the new client proxy's replication manager about the creation of this game object
+						proxy->replicationManager.create(gameObject->networkId);
+
+					}
+
+					LOG("Message received: hello - from player %s", playerName.c_str());
 				}
-
-				LOG("Message received: hello - from player %s", playerName.c_str());
 			}
+			else
+			{
+				LOG("Max number of players!");
+			}
+			
 
 			if (!newClient)
 			{
@@ -212,6 +219,7 @@ void ModuleNetworkingServer::onUpdate()
 
 					onConnectionReset(clientProxy.address);
 					destroyClientProxy(&clientProxy);
+				
 				}
 
 
@@ -245,10 +253,7 @@ void ModuleNetworkingServer::onUpdate()
 			secondsSinceLastPing = 0.0f;
 		secondsSinceLastPing += Time.deltaTime;
 
-		//if (secondsSinceLastReplication >= replicationDeliveryIntervalSeconds)
-		//	secondsSinceLastReplication = 0.0f;
-		//secondsSinceLastReplication += Time.deltaTime;
-
+	
 	}
 }
 
@@ -277,6 +282,9 @@ void ModuleNetworkingServer::onConnectionReset(const sockaddr_in & fromAddress)
 
 		// Clear the client proxy
 		destroyClientProxy(proxy);
+
+		if (num_active_players > 0)
+			num_active_players--;
 	}
 }
 
@@ -352,8 +360,33 @@ GameObject * ModuleNetworkingServer::spawnPlayer(ClientProxy &clientProxy, uint8
 {
 	// Create a new game object with the player properties
 	clientProxy.gameObject = Instantiate();
-	clientProxy.gameObject->size = { 100, 100 };
-	clientProxy.gameObject->angle = 45.0f;
+	clientProxy.gameObject->size = { 75, 75 };
+
+	switch (spawn_pos % 4)
+	{
+	case 0:
+		clientProxy.gameObject->position = { -580,-180 };
+		clientProxy.gameObject->angle = 135.0f;
+		spawn_pos++;
+		break;
+	case 1:
+		clientProxy.gameObject->position = { 580,180 };
+		clientProxy.gameObject->angle = -45.0f;
+		spawn_pos++;
+		break;
+	case 2:
+		clientProxy.gameObject->position = { -580,180 };
+		clientProxy.gameObject->angle = 45.0f;
+		spawn_pos++;
+		break;
+	case 3:
+		clientProxy.gameObject->position = { 580,-180 };
+		clientProxy.gameObject->angle = 225.0f;
+		spawn_pos++;
+		break;
+	default:
+		break;
+	}
 
 	if (spaceshipType == 0)
 	{
@@ -393,7 +426,7 @@ GameObject * ModuleNetworkingServer::spawnPlayer(ClientProxy &clientProxy, uint8
 				clientProxies[i].replicationManager.create(clientProxy.gameObject->networkId);
 		}
 	}
-
+	num_active_players++;
 	return clientProxy.gameObject;
 }
 

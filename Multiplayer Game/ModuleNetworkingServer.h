@@ -113,6 +113,9 @@ private:
 
 	uint16 listenPort = 0;
 
+	int spawn_pos = 0;
+	int num_active_players = 0;
+
 	float secondsSinceLastPing = 0.0f;
 
 	float replicationDeliveryIntervalSeconds = 0.01f;
