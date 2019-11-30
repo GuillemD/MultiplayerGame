@@ -53,6 +53,8 @@ struct Spaceship : public Behaviour
 			// Be careful, if you do NetworkDestroy(gameObject) directly,
 			// the client proxy will poing to an invalid gameObject...
 			// instead, make the gameObject invisible or disconnect the client.
+
+			// Destroy other player
 		}
 	}
 };

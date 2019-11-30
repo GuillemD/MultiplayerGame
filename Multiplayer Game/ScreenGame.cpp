@@ -1,9 +1,12 @@
 #include "Networks.h"
+#include "ModuleNetworkingServer.h"
 
 GameObject *spaceTopLeft = nullptr;
 GameObject *spaceTopRight = nullptr;
 GameObject *spaceBottomLeft = nullptr;
 GameObject *spaceBottomRight = nullptr;
+
+
 
 void ScreenGame::enable()
 {
@@ -31,6 +34,9 @@ void ScreenGame::enable()
 	spaceBottomRight = Instantiate();
 	spaceBottomRight->texture = App->modResources->space;
 	spaceBottomRight->order = -1;
+
+	App->modNetServer->spawnWalls();
+	
 }
 
 void ScreenGame::update()
