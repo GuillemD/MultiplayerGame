@@ -1,46 +1,37 @@
 #pragma once
+#include <list>
 
-enum class ReplicationAction {
+
+enum class ReplicationAction
+{
 	None,
 	Create,
 	Update,
-	Destroy
+	Destroy,
+	Notification
 };
 
-struct ReplicationCommand {
-	ReplicationAction action;
-	uint32 networkID;
-};
+struct ReplicationCommand
+{
+	ReplicationCommand(ReplicationAction action, uint32 networkId, uint32 data = 0u) : action(action), networkId(networkId), data(data) {}
 
+	ReplicationAction action = ReplicationAction::None;
+	uint32 networkId = 0u;
+
+	uint32 data = 0u;
+};
 
 class ReplicationManagerServer
 {
 public:
-
 	void create(uint32 networkId);
 	void update(uint32 networkId);
 	void destroy(uint32 networkId);
+	void notification(uint32 networkId, uint32 data);
 
-	void write(OutputMemoryStream &packet);
-
-	void AppendLostCommands(std::unordered_map<uint32, ReplicationAction> *repCommands);
-
-	std::unordered_map<uint32, ReplicationAction> replicationCommands;
+	void write(OutputMemoryStream& packet);
+	// More members... 
 
 public:
-
-	std::vector<RepCommand> commands;
-
+	std::list<ReplicationCommand*> commandList;
 };
-
-class ReplicationDeliveryDelegate : public DeliveryDelegate {
-public:
-	ReplicationDeliveryDelegate(std::unordered_map<uint32, ReplicationAction> & repCommands, ReplicationManagerServer* server);
-
-	void OnDeliverySuccess(DeliveryManager* deliveryManager) override;
-	void OnDeliveryFailure(DeliveryManager* deliveryManager) override;
-
-	std::unordered_map<uint32, ReplicationAction> storedReplicationCommands;
-	ReplicationManagerServer* serverReplicationManager = nullptr;
-};
-

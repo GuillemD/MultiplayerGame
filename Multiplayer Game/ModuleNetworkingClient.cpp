@@ -1,6 +1,8 @@
 #include "Networks.h"
 #include "ModuleNetworkingClient.h"
 
+
+
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworkingClient public methods
 //////////////////////////////////////////////////////////////////////
@@ -170,22 +172,6 @@ void ModuleNetworkingClient::onUpdate()
 		}
 		else
 		{
-			for (GameObject& gameObject : App->modGameObject->gameObjects)
-			{
-				if (gameObject.state == GameObject::UPDATING)
-				{
-					gameObject.secondsElapsed += Time.deltaTime;
-
-					float percentatge = gameObject.secondsElapsed / REPLICATION_INTERVAL_SECONDS;
-					if (percentatge > 1)
-						percentatge = 1;
-
-					gameObject.angle = ((gameObject.finalAngle - gameObject.initialAngle) * percentatge) + gameObject.initialAngle;
-					gameObject.position = ((gameObject.finalPos - gameObject.initialPos) * percentatge) + gameObject.initialPos;
-				}
-			}
-
-
 			secondsSinceLastInputDelivery += Time.deltaTime;
 			secondsSinceLastPing += Time.deltaTime;
 

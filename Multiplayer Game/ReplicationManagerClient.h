@@ -1,9 +1,7 @@
 #pragma once
-
+class ModuleNetworkingClient;
 class ReplicationManagerClient
 {
 public:
-
-	void read(const InputMemoryStream &packet);
-
+	void Read(const InputMemoryStream& packet, ModuleNetworkingClient* client);
 };

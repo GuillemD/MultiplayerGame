@@ -1,5 +1,17 @@
 #pragma once
 
+enum class TextureType
+{
+	None = -1,
+	Spacecraft1,
+	Spacecraft2,
+	Spacecraft3,
+	Laser,
+
+	Asteroid1,
+	Asteroid2
+};
+
 struct GameObject
 {
 	// Transform component
@@ -11,6 +23,7 @@ struct GameObject
 	float angle = 0.0f;
 	vec4 color = vec4{ 1.0f, 1.0f, 1.0f, 1.0f }; // NOTE(jesus): The texture will tinted with this color
 	Texture * texture = nullptr;
+	TextureType textureType = TextureType::None;
 	int  order = 0;          // NOTE(jesus): determines the drawing order
 
 	// Collider component
@@ -28,7 +41,7 @@ struct GameObject
 
 	// Tag for custom usage
 	uint32 tag = 0;
-	
+
 private:
 
 	void * operator new(size_t size) = delete;

@@ -46,18 +46,17 @@ private:
 	{
 		bool connected = false;
 		sockaddr_in address;
-		uint32 clientId;
+		uint32 clientId = 0;
 		std::string name;
 		GameObject *gameObject = nullptr;
 		double lastPacketReceivedTime = 0.0f;
 		float secondsSinceLastReplication = 0.0f;
 
-		uint32 lastInputSequenceNumberReceived = 0;
 		uint32 nextExpectedInputSequenceNumber = 0;
 		InputController gamepad;
 
-		ReplicationManagerServer replicationManagerServer;
-		DeliveryManager deliveryManagerServer;
+		ReplicationManagerServer replicationManager;
+		DeliveryManager deliveryManager;
 	};
 
 	ClientProxy clientProxies[MAX_CLIENTS];
@@ -113,8 +112,9 @@ private:
 	uint16 listenPort = 0;
 
 	float secondsSinceLastPing = 0.0f;
-	
-	float replicationDeliveryIntervalSeconds = 0.1f;
+
+	float replicationDeliveryIntervalSeconds = 0.01f;
+	float secondsSinceLastReplication = 0.0f;
 };
 
 
