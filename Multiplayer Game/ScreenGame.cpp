@@ -5,8 +5,10 @@ GameObject *spaceTopLeft = nullptr;
 GameObject *spaceTopRight = nullptr;
 GameObject *spaceBottomLeft = nullptr;
 GameObject *spaceBottomRight = nullptr;
-
-
+GameObject *wall1 = nullptr;
+GameObject *wall2 = nullptr;
+GameObject *wall3 = nullptr;
+GameObject *wall4 = nullptr;
 
 void ScreenGame::enable()
 {
@@ -35,7 +37,13 @@ void ScreenGame::enable()
 	spaceBottomRight->texture = App->modResources->space;
 	spaceBottomRight->order = -1;
 
-	App->modNetServer->spawnWalls();
+	wall1 = App->modNetServer->spawnWalls();
+	wall2 = App->modNetServer->spawnWalls();
+	wall2->position = { 150,0 };
+	wall3 = App->modNetServer->spawnWalls();
+	wall3->position = { 300,0 };
+	wall4 = App->modNetServer->spawnWalls();
+	wall4->position = { 450,0 };
 	
 }
 
@@ -69,4 +77,8 @@ void ScreenGame::disable()
 	Destroy(spaceTopRight);
 	Destroy(spaceBottomLeft);
 	Destroy(spaceBottomRight);
+	Destroy(wall1);
+	Destroy(wall2);
+	Destroy(wall3);
+	Destroy(wall4);
 }
