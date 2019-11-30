@@ -38,10 +38,12 @@ void ScreenGame::enable()
 	spaceBottomRight->order = -1;
 
 	wall1 = App->modNetServer->spawnWalls();
+	wall1->angle = 90.0f;
 	wall2 = App->modNetServer->spawnWalls();
 	wall2->position = { 150,0 };
 	wall3 = App->modNetServer->spawnWalls();
 	wall3->position = { 300,0 };
+	wall3->angle = 90.0f;
 	wall4 = App->modNetServer->spawnWalls();
 	wall4->position = { 450,0 };
 	
