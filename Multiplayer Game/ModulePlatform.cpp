@@ -275,7 +275,7 @@ bool ModulePlatform::init()
 	LOG(" - A, S, D, W: Directional pad.");
 	LOG(" - Q, E: Left and right shoulder buttons.");
 	LOG(" - ESC, SPACE: Back and start buttons.");
-	LOG(" - Arrows: Action buttons.");
+	LOG(" - W, SPACE: Action buttons.");
 
 	return true;
 }

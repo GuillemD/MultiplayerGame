@@ -83,7 +83,8 @@ public:
 
 	// NOTE(jesus): Here go spawn methods for each type of network objects
 
-
+public:
+	int num_active_players = 0;
 
 private:
 
@@ -114,7 +115,7 @@ private:
 	uint16 listenPort = 0;
 
 	int spawn_pos = 0;
-	int num_active_players = 0;
+	
 
 	float secondsSinceLastPing = 0.0f;
 

@@ -127,7 +127,7 @@ void ModuleNetworkingClient::onPacketReceived(const InputMemoryStream &packet, c
 			LOG("ModuleNetworkingClient::onPacketReceived() - Welcome from server");
 			state = ClientState::Playing;
 		}
-		else if (message == ServerMessage::Unwelcome)
+		else if (message == ServerMessage::Unwelcome || App->modNetServer->num_active_players > 4)
 		{
 			WLOG("ModuleNetworkingClient::onPacketReceived() - Unwelcome from server :-(");
 			disconnect();
