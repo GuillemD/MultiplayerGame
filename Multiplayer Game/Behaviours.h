@@ -85,7 +85,7 @@ struct Laser : public Behaviour
 
 	void onCollisionTriggered(Collider &c1, Collider &c2) override
 	{
-		if (c2.type == ColliderType::Wall)
+		if (c2.type == ColliderType::Wall || c2.type == ColliderType::Cover)
 		{
 			NetworkDestroy(gameObject);
 		}
