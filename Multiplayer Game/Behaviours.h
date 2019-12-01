@@ -56,6 +56,8 @@ struct Spaceship : public Behaviour
 			// instead, make the gameObject invisible or disconnect the client.
 
 			// Destroy other player
+
+			App->modNetServer->DisconectClient(c1.gameObject);
 		}
 		if (c2.type == ColliderType::Wall)
 		{

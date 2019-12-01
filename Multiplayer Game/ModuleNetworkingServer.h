@@ -12,7 +12,7 @@ public:
 
 	void setListenPort(int port);
 
-
+	void DisconectClient(GameObject* object);
 
 private:
 
@@ -67,7 +67,9 @@ private:
 
 	void destroyClientProxy(ClientProxy * proxy);
 
+	ClientProxy* GetProxy(GameObject* object);
 
+	void DisconectClient(ModuleNetworkingServer::ClientProxy* clientProxy);
 
 public:
 

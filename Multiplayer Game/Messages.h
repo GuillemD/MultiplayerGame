@@ -14,5 +14,12 @@ enum class ServerMessage
 	Unwelcome,
 	Replication,
 	Ping,
-	Reply
+	Reply,
+	Disconnect
+};
+
+enum class Disconnection
+{
+	Death,
+	Input,
 };

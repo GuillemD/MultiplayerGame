@@ -92,9 +92,9 @@ void ScreenGame::enable()
 	coverCenter1->size = { 20,170 };
 	coverCenter1->angle = 45.0f;
 
-	coverCenter2 = App->modNetServer->spawnWalls();
-	coverCenter2->size = { 20,170 };
-	coverCenter2->angle = -45.0f;
+	//coverCenter2 = App->modNetServer->spawnWalls();
+	//coverCenter2->size = { 20,170 };
+	//coverCenter2->angle = -45.0f;
 
 
 }
