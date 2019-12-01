@@ -116,6 +116,13 @@ struct Asteroid : public Behaviour
 		{
 			NetworkDestroy(gameObject);
 			//recalculate players hp
+
+			App->modNetServer->DisconectClient(c2.gameObject);
+		}
+
+		if (c2.type == ColliderType::Laser )
+		{
+			NetworkDestroy(gameObject);
 		}
 	}
 };
