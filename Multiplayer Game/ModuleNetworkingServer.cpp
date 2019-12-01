@@ -435,7 +435,7 @@ GameObject * ModuleNetworkingServer::spawnWalls()
 	// Create a new GameObject asteroid
 	GameObject *gameObject = Instantiate();
 	gameObject->texture = App->modResources->wall;
-	gameObject->textureType = TextureType::Asteroid1;
+	gameObject->textureType = TextureType::Wall;
 	gameObject->collider = App->modCollision->addCollider(ColliderType::Wall, gameObject);
 
 	return gameObject;

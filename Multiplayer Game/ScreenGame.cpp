@@ -19,7 +19,7 @@ GameObject *coverBotLeft = nullptr;
 GameObject *coverBotRight = nullptr;
 
 GameObject *coverCenter1 = nullptr;
-GameObject *coverCenter2 = nullptr;
+
 
 void ScreenGame::enable()
 {
@@ -49,52 +49,76 @@ void ScreenGame::enable()
 	spaceBottomRight->order = -1;
 
 	//left wall
-	wall1 = App->modNetServer->spawnWalls();
+	wall1 = Instantiate();
+	wall1->texture = App->modResources->wall;
+	wall1->textureType = TextureType::Wall;
+	wall1->collider = App->modCollision->addCollider(ColliderType::Wall, wall1);
 	wall1->size = { 50,800 };
 	wall1->position = { -760,0 };
 	//top wall
-	wall2 = App->modNetServer->spawnWalls();
+	wall2 = Instantiate();
+	wall2->texture = App->modResources->wall;
+	wall2->textureType = TextureType::Wall;
+	wall2->collider = App->modCollision->addCollider(ColliderType::Wall, wall2);
 	wall2->size = { 50,1470 };
 	wall2->position = { 0,-390 };
 	wall2->angle = 90.0f;
 	//right wall
-	wall3 = App->modNetServer->spawnWalls();
+	wall3 = Instantiate();
+	wall3->texture = App->modResources->wall;
+	wall3->textureType = TextureType::Wall;
+	wall3->collider = App->modCollision->addCollider(ColliderType::Wall, wall3);
 	wall3->size = { 50,800 };
 	wall3->position = { 760,0 };
 	//bottom wall
-	wall4 = App->modNetServer->spawnWalls();
+	wall4 = Instantiate();
+	wall4->texture = App->modResources->wall;
+	wall4->textureType = TextureType::Wall;
+	wall4->collider = App->modCollision->addCollider(ColliderType::Wall, wall4);
 	wall4->size = { 50,1470 };
 	wall4->position = { 0,390 };
 	wall4->angle = 90.0f;
 
 	//top left cover
-	coverTopLeft = App->modNetServer->spawnWalls();
+	coverTopLeft = Instantiate();
+	coverTopLeft->texture = App->modResources->wall;
+	coverTopLeft->textureType = TextureType::Wall;
+	coverTopLeft->collider = App->modCollision->addCollider(ColliderType::Wall, coverTopLeft);
 	coverTopLeft->size = { 20,110 };
 	coverTopLeft->position = { -490,-180 };
 
 	//top right cover
-	coverTopRight = App->modNetServer->spawnWalls();
+	coverTopRight = Instantiate();
+	coverTopRight->texture = App->modResources->wall;
+	coverTopRight->textureType = TextureType::Wall;
+	coverTopRight->collider = App->modCollision->addCollider(ColliderType::Wall, coverTopRight);
 	coverTopRight->size = { 20,110 };
 	coverTopRight->position = { 490,-180 };
 
 	//bot left cover
-	coverBotLeft = App->modNetServer->spawnWalls();
+	coverBotLeft = Instantiate();
+	coverBotLeft->texture = App->modResources->wall;
+	coverBotLeft->textureType = TextureType::Wall;
+	coverBotLeft->collider = App->modCollision->addCollider(ColliderType::Wall, coverBotLeft);
 	coverBotLeft->size = { 20,110 };
 	coverBotLeft->position = { -490, 180 };
 
 	//bot right cover
-	coverBotRight = App->modNetServer->spawnWalls();
+	coverBotRight = Instantiate();
+	coverBotRight->texture = App->modResources->wall;
+	coverBotRight->textureType = TextureType::Wall;
+	coverBotRight->collider = App->modCollision->addCollider(ColliderType::Wall, coverBotRight);
 	coverBotRight->size = { 20,110 };
 	coverBotRight->position = { 490,180 };
 
 	//center
-	coverCenter1 = App->modNetServer->spawnWalls();
+	coverCenter1 = Instantiate();
+	coverCenter1->texture = App->modResources->wall;
+	coverCenter1->textureType = TextureType::Wall;
+	coverCenter1->collider = App->modCollision->addCollider(ColliderType::Wall, coverCenter1);
 	coverCenter1->size = { 20,170 };
-	coverCenter1->angle = 45.0f;
+	coverCenter1->position = { 20,-20 };
 
-	coverCenter2 = App->modNetServer->spawnWalls();
-	coverCenter2->size = { 20,170 };
-	coverCenter2->angle = -45.0f;
 
 
 }
@@ -141,5 +165,5 @@ void ScreenGame::disable()
 	Destroy(coverBotRight);
 
 	Destroy(coverCenter1);
-	Destroy(coverCenter2);
+
 }
