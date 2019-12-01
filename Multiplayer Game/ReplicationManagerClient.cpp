@@ -58,6 +58,8 @@ void ReplicationManagerClient::Read(const InputMemoryStream& packet, ModuleNetwo
 					case TextureType::Laser:
 						newGo->texture = App->modResources->laser;
 						break;
+					case TextureType::Asteroid1:
+						newGo->texture = App->modResources->asteroid1;
 					default:
 						break;
 					}

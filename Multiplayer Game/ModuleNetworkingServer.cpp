@@ -476,7 +476,7 @@ GameObject * ModuleNetworkingServer::spawnBullet(GameObject *parent)
 GameObject * ModuleNetworkingServer::spawnAsteroid(vec2 pos, float angle)
 {
 	GameObject *gameObject = Instantiate();
-	gameObject->size = { 40,40 };
+	gameObject->size = { 70,70 };
 	gameObject->position = pos;
 	gameObject->angle = angle;
 
@@ -514,13 +514,38 @@ void ModuleNetworkingServer::AsteroidSpawner()
 
 		if (secondsSinceLastAsteroid > asteroidInterval)
 		{
-			//int outPut = rand() % 5;
-			int outPut = 0;
+			int outPut = rand() % 5;
+			vec2 asteroid_pos = { 100,420 };
+			vec2 asteroid_pos1 = { 780,50 };
+			vec2 asteroid_pos2 = { -500,420 };
+			vec2 asteroid_pos3 = { -780,120 };
+			vec2 asteroid_pos4 = { 400,-420 };
+
 			switch (outPut)
 			{
 			case 0:
-				vec2 asteroid_pos = { 0,0 };
-				spawnAsteroid(asteroid_pos, 45.0f);
+				
+				spawnAsteroid(asteroid_pos, 340.0f);
+				secondsSinceLastAsteroid = 0.0f;
+				break;
+			case 1:
+				
+				spawnAsteroid(asteroid_pos1, 275.0f);
+				secondsSinceLastAsteroid = 0.0f;
+				break;
+			case 2:
+				
+				spawnAsteroid(asteroid_pos2, 40.0f);
+				secondsSinceLastAsteroid = 0.0f;
+				break;
+			case 3:
+				
+				spawnAsteroid(asteroid_pos3, 105.f);
+				secondsSinceLastAsteroid = 0.0f;
+				break;
+			case 4:
+				
+				spawnAsteroid(asteroid_pos4, 200.0f);
 				secondsSinceLastAsteroid = 0.0f;
 				break;
 			}

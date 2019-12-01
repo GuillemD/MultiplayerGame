@@ -104,7 +104,7 @@ struct Asteroid : public Behaviour
 
 		NetworkUpdate(gameObject);
 
-		const float lifetimeSeconds = 7.0f;
+		const float lifetimeSeconds = 10.0f;
 		if (secondsSinceCreation > lifetimeSeconds) NetworkDestroy(gameObject);
 	}
 
