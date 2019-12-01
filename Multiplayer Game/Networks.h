@@ -33,7 +33,7 @@
 #define MAX_TEXTURES                                     512
 #define MAX_GAME_OBJECTS                                4096
 #define MAX_COLLIDERS                       MAX_GAME_OBJECTS
-#define MAX_CLIENTS                                        4
+#define MAX_CLIENTS                                       32
 #define MAX_NETWORK_OBJECTS                              512
 
 #define SCENE_TRANSITION_TIME_SECONDS                   1.0f
