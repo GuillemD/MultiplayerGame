@@ -81,44 +81,42 @@ void ScreenGame::enable()
 
 	//top left cover
 	coverTopLeft = Instantiate();
-	coverTopLeft->texture = App->modResources->wall;
-	coverTopLeft->textureType = TextureType::Wall;
-	coverTopLeft->collider = App->modCollision->addCollider(ColliderType::Wall, coverTopLeft);
+	coverTopLeft->texture = App->modResources->cover;
+	coverTopLeft->textureType = TextureType::Cover;
+	coverTopLeft->collider = App->modCollision->addCollider(ColliderType::Cover, coverTopLeft);
 	coverTopLeft->size = { 20,110 };
 	coverTopLeft->position = { -490,-180 };
 
 	//top right cover
 	coverTopRight = Instantiate();
-	coverTopRight->texture = App->modResources->wall;
-	coverTopRight->textureType = TextureType::Wall;
-	coverTopRight->collider = App->modCollision->addCollider(ColliderType::Wall, coverTopRight);
+	coverTopRight->texture = App->modResources->cover;
+	coverTopRight->textureType = TextureType::Cover;
+	coverTopRight->collider = App->modCollision->addCollider(ColliderType::Cover, coverTopRight);
 	coverTopRight->size = { 20,110 };
 	coverTopRight->position = { 490,-180 };
 
 	//bot left cover
 	coverBotLeft = Instantiate();
-	coverBotLeft->texture = App->modResources->wall;
-	coverBotLeft->textureType = TextureType::Wall;
-	coverBotLeft->collider = App->modCollision->addCollider(ColliderType::Wall, coverBotLeft);
+	coverBotLeft->texture = App->modResources->cover;
+	coverBotLeft->textureType = TextureType::Cover;
+	coverBotLeft->collider = App->modCollision->addCollider(ColliderType::Cover, coverBotLeft);
 	coverBotLeft->size = { 20,110 };
 	coverBotLeft->position = { -490, 180 };
 
 	//bot right cover
 	coverBotRight = Instantiate();
-	coverBotRight->texture = App->modResources->wall;
-	coverBotRight->textureType = TextureType::Wall;
-	coverBotRight->collider = App->modCollision->addCollider(ColliderType::Wall, coverBotRight);
+	coverBotRight->texture = App->modResources->cover;
+	coverBotRight->textureType = TextureType::Cover;
+	coverBotRight->collider = App->modCollision->addCollider(ColliderType::Cover, coverBotRight);
 	coverBotRight->size = { 20,110 };
 	coverBotRight->position = { 490,180 };
 
 	//center
 	coverCenter1 = Instantiate();
-	coverCenter1->texture = App->modResources->wall;
-	coverCenter1->textureType = TextureType::Wall;
-	coverCenter1->collider = App->modCollision->addCollider(ColliderType::Wall, coverCenter1);
+	coverCenter1->texture = App->modResources->cover;
+	coverCenter1->textureType = TextureType::Cover;
+	coverCenter1->collider = App->modCollision->addCollider(ColliderType::Cover, coverCenter1);
 	coverCenter1->size = { 20,170 };
-	coverCenter1->position = { 20,-20 };
-
 
 }
 

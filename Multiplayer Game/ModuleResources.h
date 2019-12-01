@@ -17,6 +17,7 @@ public:
 	Texture *spacecraft3 = nullptr;
 	Texture *laser = nullptr;
 	Texture *wall = nullptr;
+	Texture *cover = nullptr;
 
 	bool finishedLoading = false;
 private:
