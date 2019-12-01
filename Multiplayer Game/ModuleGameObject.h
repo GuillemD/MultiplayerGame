@@ -9,7 +9,9 @@ enum class TextureType
 	Laser,
 
 	Asteroid1,
-	Asteroid2
+	Asteroid2,
+	Wall,
+	Cover
 };
 
 struct GameObject

@@ -81,7 +81,8 @@ enum class ColliderType
 	Player,
 	Laser,
 	Wall,
-	Asteroid
+	Asteroid,
+	Cover
 };
 
 
