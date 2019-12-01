@@ -2,8 +2,12 @@
 We are two students from UPC CITM Barcelona developing a 2D game in C++ for networking subject.
 
 ## Installation
-Decompress the .zip file in any directory and execute the executable inside the decompressed folder.
+Decompress the .zip file in any directory and execute the solution inside the decompressed folder.
 
+## Tutorial
+
+Execute the solution. Create a server and 2 clients in order to play 1 on 1. 
+4 players max.
 
 ## Controls:
 
@@ -11,6 +15,11 @@ Decompress the .zip file in any directory and execute the executable inside the 
 #### D: Move right
 #### W: Move forward
 #### SPACE: Shoot
+
+## Features:
+
+Replication: Guillem Domínguez
+Delivery Manager: Guillem Arman
 
 
 ## Bugs:
