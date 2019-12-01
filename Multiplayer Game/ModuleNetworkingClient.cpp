@@ -90,15 +90,12 @@ void ModuleNetworkingClient::onGui()
 			ImGui::Text(" - Network id: %u", networkId);
 
 			vec2 playerPosition = {};
-			int h = 0;
 
 			GameObject *playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (playerGameObject != nullptr) {
 				playerPosition = playerGameObject->position;
-				h = playerGameObject->hp;
 			}
 			ImGui::Text(" - Coordinates: (%f, %f)", playerPosition.x, playerPosition.y);
-			ImGui::Text(" - hp: %d", h);
 
 
 			ImGui::Separator();
@@ -111,6 +108,19 @@ void ModuleNetworkingClient::onGui()
 
 			ImGui::Text("Input:");
 			ImGui::InputFloat("Delivery interval (s)", &inputDeliveryIntervalSeconds, 0.01f, 0.1f, 4);
+		}
+	}
+	if (state == ClientState::Playing)
+	{
+		GameObject *player = App->modLinkingContext->getNetworkGameObject(networkId);
+		if(player)
+		{
+			int h = 0;
+			ImGui::SetNextWindowPos({ ((float)Window.width / 2) - 50, ((float)Window.height / 2) - 100 });
+			ImGui::Begin("HP", nullptr, ImGuiWindowFlags_NoCollapse);
+			h = player->hp;
+			ImGui::Text(" %d /100 ", h);
+			ImGui::End();
 		}
 	}
 	
