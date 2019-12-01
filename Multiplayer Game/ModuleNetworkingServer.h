@@ -75,14 +75,20 @@ public:
 	// Spawning network objects
 	//////////////////////////////////////////////////////////////////////
 
+	// NOTE(jesus): Here go spawn methods for each type of network objects
+
 	GameObject * spawnPlayer(ClientProxy &clientProxy, uint8 spaceshipType);
 
 	GameObject * spawnWalls();
 
 	GameObject * spawnBullet(GameObject *parent);
 
-	// NOTE(jesus): Here go spawn methods for each type of network objects
+	GameObject * spawnAsteroid(vec2 pos, float angle);
 
+	void AsteroidSpawner();
+
+	float secondsSinceLastAsteroid = 0.0f;
+	float asteroidInterval = 7.0f;
 
 
 private:

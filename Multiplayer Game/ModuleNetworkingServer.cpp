@@ -253,7 +253,7 @@ void ModuleNetworkingServer::onUpdate()
 			secondsSinceLastPing = 0.0f;
 		secondsSinceLastPing += Time.deltaTime;
 
-	
+		AsteroidSpawner();
 	}
 }
 
@@ -471,6 +471,61 @@ GameObject * ModuleNetworkingServer::spawnBullet(GameObject *parent)
 	}
 
 	return gameObject;
+}
+
+GameObject * ModuleNetworkingServer::spawnAsteroid(vec2 pos, float angle)
+{
+	GameObject *gameObject = Instantiate();
+	gameObject->size = { 40,40 };
+	gameObject->position = pos;
+	gameObject->angle = angle;
+
+	gameObject->texture = App->modResources->asteroid1;
+	gameObject->textureType = TextureType::Asteroid1;
+
+	gameObject->collider = App->modCollision->addCollider(ColliderType::Asteroid, gameObject);
+	gameObject->collider->isTrigger = true;
+
+	// Create behaviour
+	gameObject->behaviour = new Asteroid;
+	gameObject->behaviour->gameObject = gameObject;
+
+	// Assign a new network identity to the object
+	App->modLinkingContext->registerNetworkGameObject(gameObject);
+
+	// Notify all client proxies' replication manager to create the object remotely
+	for (int i = 0; i < MAX_CLIENTS; ++i)
+	{
+		if (clientProxies[i].connected)
+		{
+			// TODO(jesus): Notify this proxy's replication manager about the creation of this game object
+			clientProxies[i].replicationManager.create(gameObject->networkId);
+		}
+	}
+
+	return gameObject;
+}
+
+void ModuleNetworkingServer::AsteroidSpawner()
+{
+	if (num_active_players > 0)
+	{
+		secondsSinceLastAsteroid += Time.deltaTime;
+
+		if (secondsSinceLastAsteroid > asteroidInterval)
+		{
+			//int outPut = rand() % 5;
+			int outPut = 0;
+			switch (outPut)
+			{
+			case 0:
+				vec2 asteroid_pos = { 0,0 };
+				spawnAsteroid(asteroid_pos, 45.0f);
+				secondsSinceLastAsteroid = 0.0f;
+				break;
+			}
+		}
+	}
 }
 
 

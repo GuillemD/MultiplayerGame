@@ -21,8 +21,6 @@ GameObject *coverBotRight = nullptr;
 GameObject *coverCenter1 = nullptr;
 GameObject *coverCenter2 = nullptr;
 
-
-
 void ScreenGame::enable()
 {
 	if (isServer)

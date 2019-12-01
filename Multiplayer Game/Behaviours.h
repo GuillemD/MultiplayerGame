@@ -89,3 +89,31 @@ struct Laser : public Behaviour
 		}
 	}
 };
+
+struct Asteroid : public Behaviour
+{
+	float secondsSinceCreation = 0.0f;
+
+	
+	void update() override
+	{
+		const float speed = 200.0f;
+		gameObject->position += vec2FromDegrees(gameObject->angle) * speed * Time.deltaTime;
+
+		secondsSinceCreation += Time.deltaTime;
+
+		NetworkUpdate(gameObject);
+
+		const float lifetimeSeconds = 7.0f;
+		if (secondsSinceCreation > lifetimeSeconds) NetworkDestroy(gameObject);
+	}
+
+	void onCollisionTriggered(Collider &c1, Collider &c2) override
+	{
+		if (c2.type == ColliderType::Player)
+		{
+			NetworkDestroy(gameObject);
+			//recalculate players hp
+		}
+	}
+};

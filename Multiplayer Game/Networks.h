@@ -80,7 +80,8 @@ enum class ColliderType
 	None,
 	Player,
 	Laser,
-	Wall
+	Wall,
+	Asteroid
 };
 
 
