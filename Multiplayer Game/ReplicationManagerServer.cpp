@@ -62,6 +62,8 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << go->color.b;
 				packet << go->color.a;
 
+				packet << go->hp;
+
 				packet << go->textureType;
 
 				packet << go->tag;

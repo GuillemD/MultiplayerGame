@@ -436,6 +436,8 @@ GameObject * ModuleNetworkingServer::spawnPlayer(ClientProxy &clientProxy, uint8
 		clientProxy.gameObject->textureType = TextureType::Spacecraft3;
 	}
 
+
+	clientProxy.gameObject->hp = 100;
 	// Create collider
 	clientProxy.gameObject->collider = App->modCollision->addCollider(ColliderType::Player, clientProxy.gameObject);
 	clientProxy.gameObject->collider->isTrigger = true;
@@ -515,7 +517,7 @@ GameObject * ModuleNetworkingServer::spawnAsteroid(vec2 pos, float angle)
 	gameObject->textureType = TextureType::Asteroid1;
 
 	gameObject->collider = App->modCollision->addCollider(ColliderType::Asteroid, gameObject);
-	gameObject->collider->isTrigger = true;
+	//gameObject->collider->isTrigger = true;
 
 	// Create behaviour
 	gameObject->behaviour = new Asteroid;

@@ -44,6 +44,8 @@ struct GameObject
 	// Tag for custom usage
 	uint32 tag = 0;
 
+	int hp = 0;
+
 private:
 
 	void * operator new(size_t size) = delete;

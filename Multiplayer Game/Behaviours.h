@@ -15,12 +15,23 @@ struct Behaviour
 
 struct Spaceship : public Behaviour
 {
-	
+	bool asteroid_hit = false;
 	void start() override
 	{
 		gameObject->tag = (uint32)(Random.next() * UINT_MAX);
 	}
+	void update() override
+	{
+		if (asteroid_hit)
+		{
+			gameObject->hp -= 75;
 
+			asteroid_hit = false;
+			if (gameObject->hp <= 0)
+				App->modNetServer->DisconectClient(gameObject);
+
+		}
+	}
 	void onInput(const InputController &input) override
 	{
 		if (input.horizontalAxis != 0.0f)
@@ -56,8 +67,16 @@ struct Spaceship : public Behaviour
 			// instead, make the gameObject invisible or disconnect the client.
 
 			// Destroy other player
+			gameObject->hp = gameObject->hp - 25;
+			if(gameObject->hp <= 0)
+				App->modNetServer->DisconectClient(c1.gameObject);
 
-			App->modNetServer->DisconectClient(c1.gameObject);
+
+		}
+		if (c2.type == ColliderType::Asteroid)
+		{
+			asteroid_hit = true;
+			NetworkDestroy(c2.gameObject);
 		}
 		if (c2.type == ColliderType::Wall)
 		{
@@ -89,6 +108,11 @@ struct Laser : public Behaviour
 		{
 			NetworkDestroy(gameObject);
 		}
+		if (c2.type == ColliderType::Asteroid)
+		{
+			NetworkDestroy(c2.gameObject);
+			NetworkDestroy(gameObject);
+		}
 	}
 };
 
@@ -110,19 +134,4 @@ struct Asteroid : public Behaviour
 		if (secondsSinceCreation > lifetimeSeconds) NetworkDestroy(gameObject);
 	}
 
-	void onCollisionTriggered(Collider &c1, Collider &c2) override
-	{
-		if (c2.type == ColliderType::Player)
-		{
-			NetworkDestroy(gameObject);
-			//recalculate players hp
-
-			App->modNetServer->DisconectClient(c2.gameObject);
-		}
-
-		if (c2.type == ColliderType::Laser )
-		{
-			NetworkDestroy(gameObject);
-		}
-	}
 };

@@ -42,6 +42,8 @@ void ReplicationManagerClient::Read(const InputMemoryStream& packet, ModuleNetwo
 					packet >> newGo->color.b;
 					packet >> newGo->color.a;
 
+					packet >> newGo->hp;
+
 					packet >> newGo->textureType;
 
 					switch (newGo->textureType)

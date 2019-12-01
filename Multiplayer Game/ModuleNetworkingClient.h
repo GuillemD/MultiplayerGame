@@ -65,7 +65,7 @@ private:
 
 	// Input ///////////
 
-	static const int MAX_INPUT_DATA_SIMULTANEOUS_PACKETS = 64;
+	static const int MAX_INPUT_DATA_SIMULTANEOUS_PACKETS = 256;
 
 	// Queue of input data
 	InputPacketData inputData[MAX_INPUT_DATA_SIMULTANEOUS_PACKETS];
@@ -84,5 +84,6 @@ private:
 	ReplicationManagerClient replicationManager;
 
 	DeliveryManager* deliveryManager;
+
 };
 
