@@ -82,6 +82,8 @@ void ReplicationManagerClient::Read(const InputMemoryStream& packet, ModuleNetwo
 					packet >> go->position.y;
 
 					packet >> go->angle;
+
+					packet >> go->hp;
 				}
 			}
 			break;

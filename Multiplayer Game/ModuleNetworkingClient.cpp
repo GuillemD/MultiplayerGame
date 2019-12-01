@@ -26,7 +26,6 @@ void ModuleNetworkingClient::SetInputDataFront(uint32 front)
 }
 
 
-
 //////////////////////////////////////////////////////////////////////
 // ModuleNetworking virtual methods
 //////////////////////////////////////////////////////////////////////
@@ -91,16 +90,16 @@ void ModuleNetworkingClient::onGui()
 			ImGui::Text(" - Network id: %u", networkId);
 
 			vec2 playerPosition = {};
-			int hp = 100;
+			int h = 0;
+
 			GameObject *playerGameObject = App->modLinkingContext->getNetworkGameObject(networkId);
 			if (playerGameObject != nullptr) {
 				playerPosition = playerGameObject->position;
-				hp = playerGameObject->hp;
+				h = playerGameObject->hp;
 			}
 			ImGui::Text(" - Coordinates: (%f, %f)", playerPosition.x, playerPosition.y);
-			
-			
-			ImGui::Text(" - HP: %d/100", hp);
+			ImGui::Text(" - hp: %d", h);
+
 
 			ImGui::Separator();
 

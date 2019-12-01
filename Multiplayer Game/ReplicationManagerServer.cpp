@@ -80,6 +80,8 @@ void ReplicationManagerServer::write(OutputMemoryStream& packet)
 				packet << go->position.y;
 
 				packet << go->angle;
+
+				packet << go->hp;
 			}
 			else packet << -1;
 			break;

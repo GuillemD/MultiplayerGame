@@ -29,8 +29,11 @@ struct Spaceship : public Behaviour
 			asteroid_hit = false;
 			if (gameObject->hp <= 0)
 				App->modNetServer->DisconectClient(gameObject);
+		
 
 		}
+		
+		
 	}
 	void onInput(const InputController &input) override
 	{

@@ -438,6 +438,7 @@ GameObject * ModuleNetworkingServer::spawnPlayer(ClientProxy &clientProxy, uint8
 
 
 	clientProxy.gameObject->hp = 100;
+
 	// Create collider
 	clientProxy.gameObject->collider = App->modCollision->addCollider(ColliderType::Player, clientProxy.gameObject);
 	clientProxy.gameObject->collider->isTrigger = true;
